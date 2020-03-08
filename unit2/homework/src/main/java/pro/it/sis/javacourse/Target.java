@@ -14,9 +14,41 @@ public class Target {
         return iceDamage;
     }
 
+    public void setPhysicalDamage(int physicalD) {
+
+        physicalDamage = physicalD;
+    }
+
+    public void setFireDamage(int fireD) {
+
+        fireDamage = fireD;
+    }
+
+    public void setIceDamage(int iceD) {
+        iceDamage = iceD;
+    }
+
     private int physicalDamage;
 
     private int fireDamage;
 
     private int iceDamage;
+}
+
+class IceGiant extends Target {
+
+    @Override
+    public void setIceDamage(int iceD) {
+        System.out.printf("Resisted: %d ice damage \n", iceD);
+    }
+
+}
+
+class Ifrit extends Target {
+
+    @Override
+    public void setFireDamage(int fireD) {
+        System.out.printf("Resisted: %d fire damage \n", fireD);
+    }
+
 }
