@@ -18,6 +18,12 @@ public class WeaponTest {
         assertEquals(100, testTarget.getPhysicalDamage());
         assertEquals(50, testTarget.getFireDamage());
 
+        testTarget.resurection();
+        blazingAsphalt.hit(testTarget);
+        blazingAsphalt.hit(testTarget);
+        blazingAsphalt.hit(testTarget);
+        assertEquals(300, testTarget.getPhysicalDamage());
+
         Ifrit Boris = new Ifrit();
         blazingAsphalt.hit(Boris);
         assertEquals(100, Boris.getPhysicalDamage());
