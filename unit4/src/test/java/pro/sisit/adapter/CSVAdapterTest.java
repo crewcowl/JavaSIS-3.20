@@ -12,8 +12,6 @@ import pro.sisit.adapter.impl.CSVAdapter;
 import pro.sisit.model.Book;
 import pro.sisit.model.Author;
 
-// TODO: 2. Описать тестовые кейсы
-
 public class CSVAdapterTest {
 
     @Before
@@ -49,7 +47,7 @@ public class CSVAdapterTest {
     @Test
     public void testMethods() throws IOException {
         int index = 0;
-        //Тест Книги
+        //book test
         Path bookFilePath = Paths.get("test-book-file.csv");
 
         BufferedReader bookReader = new BufferedReader(
@@ -61,8 +59,8 @@ public class CSVAdapterTest {
         IOAdapter<Book> bookCsvAdapter =
                 new CSVAdapter<>(Book.class, bookReader, bookWriter);
 
-        Book book1 = new Book("Зов ктулху", "Лавкрафт","Ужасы", "978-5-17-118366-0");
-        Book book2 = new Book("Хребты безумия", "Лавкрафт","Ужасы", "876-5-91-118366-0");
+        Book book1 = new Book("JoyLand", "Stephen King","Horror", "978-5-17-118366-0");
+        Book book2 = new Book("Stephen King", "Lovecraft","Horror", "876-5-91-118366-0");
 
         bookReader.mark((int) (bookFilePath.toFile().length()+book1.setCSVLine().length()+1));
         index = bookCsvAdapter.append(book1);
@@ -76,20 +74,20 @@ public class CSVAdapterTest {
         bookReader.mark((int)bookFilePath.toFile().length());
         Book bookAtIndex1 = bookCsvAdapter.read(1);
         bookReader.reset();
-        if (bookAtIndex1.equals(book1)) System.out.print("Пройдено\n");
+        if (bookAtIndex1.equals(book1)) System.out.print("checked\n");
 
         Book bookAtIndex2 = bookCsvAdapter.read(index);
         bookReader.reset();
-        if (bookAtIndex2.equals(book2)) System.out.print("Пройдено\n");
+        if (bookAtIndex2.equals(book2)) System.out.print("checked\n");
 
         bookAtIndex2 = bookCsvAdapter.read(1);
         bookReader.reset();
-        if (bookAtIndex2.equals(book1)) System.out.print("Пройдено\n");
+        if (bookAtIndex2.equals(book1)) System.out.print("checked\n");
 
         bookWriter.close();
         bookReader.close();
 
-        //Тест автора
+        //author test
         Path authorFilePath = Paths.get("test-author-file.csv");
 
         BufferedReader authorReader = new BufferedReader(
@@ -101,8 +99,8 @@ public class CSVAdapterTest {
         IOAdapter<Author> authorCsvAdapter =
                 new CSVAdapter<>(Author.class, authorReader, authorWriter);
 
-        Author Author1 = new Author("Лавкрафт","Провиденс");
-        Author Author2 = new Author ("Кинг","Портленд");
+        Author Author1 = new Author("Stephen King","Portland");
+        Author Author2 = new Author ("Lovecraft","Providence");
 
         authorReader.mark((int) (authorFilePath.toFile().length()+Author1.setCSVLine().length()+1));
         index = authorCsvAdapter.append(Author1);
@@ -116,18 +114,17 @@ public class CSVAdapterTest {
         authorReader.mark((int)authorFilePath.toFile().length());
         Author AuthorAtIndex1 = authorCsvAdapter.read(1);
         authorReader.reset();
-        if (AuthorAtIndex1.equals(Author1)) System.out.print("Пройдено\n");
+        if (AuthorAtIndex1.equals(Author1)) System.out.print("checked\n");
 
         Author AuthorAtIndex2 = authorCsvAdapter.read(index);
         authorReader.reset();
-        if (AuthorAtIndex2.equals(Author2)) System.out.print("Пройдено\n");
+        if (AuthorAtIndex2.equals(Author2)) System.out.print("checked\n");
 
         AuthorAtIndex2 = authorCsvAdapter.read(1);
         authorReader.reset();
-        if (AuthorAtIndex2.equals(Author1)) System.out.print("Пройдено\n");
+        if (AuthorAtIndex2.equals(Author1)) System.out.print("checked\n");
 
         authorWriter.close();
         authorReader.close();
     }
-
 }
