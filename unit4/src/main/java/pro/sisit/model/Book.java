@@ -1,13 +1,22 @@
 package pro.sisit.model;
 
+import pro.sisit.adapter.CSVImpl;
+
 import java.util.Objects;
 
-public class Book {
+public class Book implements CSVImpl {
 
     private String name;
     private String author;
     private String genre;
     private String isbn;
+
+    public Book () {
+        this.name = null;
+        this.author = null;
+        this.genre = null;
+        this.isbn = null;
+    }
 
     public Book(String name, String author, String genre, String isbn) {
         this.name = name;
@@ -50,5 +59,20 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getAuthor(), getGenre(), getIsbn());
+    }
+
+
+    @Override
+    public void getCSVLine(String text) {
+        String[] newBook = text.split(",");
+        this.name = newBook[0];
+        this.author = newBook[1];
+        this.genre = newBook[2];
+        this.isbn = newBook[3];
+    }
+
+    @Override
+    public String setCSVLine() {
+        return name + "," + author + "," + genre + "," + isbn + "\n";
     }
 }

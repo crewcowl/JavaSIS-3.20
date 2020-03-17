@@ -2,7 +2,7 @@ package pro.sisit.adapter;
 
 public interface IOAdapter<T> {
 
-    T read(int index);
-
+    T read(int rowIndex);
     int append(T entity);
+
 }

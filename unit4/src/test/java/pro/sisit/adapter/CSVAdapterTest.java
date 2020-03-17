@@ -2,11 +2,7 @@ package pro.sisit.adapter;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.After;
@@ -14,79 +10,124 @@ import org.junit.Before;
 import org.junit.Test;
 import pro.sisit.adapter.impl.CSVAdapter;
 import pro.sisit.model.Book;
+import pro.sisit.model.Author;
 
-// TODO: 2. Описать тестовые кейсы
+// TODO: 2. ������� �������� �����
 
 public class CSVAdapterTest {
 
     @Before
     public void createFile() {
-        // TODO: создать и заполнить csv-файл для сущности Author
-        // TODO: создать и заполнить csv-файл для сущности Book
 
-        // * По желанию можете придумать и свои сущности
+        File bookFile = new File("test-book-file.csv");
+        try {
+            if(!bookFile.exists()) bookFile.createNewFile();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        File authorFile = new File("test-author-file.csv");
+        try {
+            if(!authorFile.exists()) authorFile.createNewFile();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @After
     public void deleteFile() {
-        // TODO: удалить файлы после тестирования
+        File authorFile = new File("test-author-file.csv");
+        if(authorFile.exists()) authorFile.delete();
+
+        File bookFile = new File("test-book-file.csv");
+        if(bookFile.exists()) bookFile.delete();
+
     }
 
     @Test
-    public void testRead() throws IOException {
-
+    public void testMethods() throws IOException {
+        int index = 0;
+        //���� �����
         Path bookFilePath = Paths.get("test-book-file.csv");
 
         BufferedReader bookReader = new BufferedReader(
-            new FileReader(bookFilePath.toFile()));
+                new FileReader(bookFilePath.toFile()));
 
         BufferedWriter bookWriter = new BufferedWriter(
-            new FileWriter(bookFilePath.toFile(), true));
+                new FileWriter(bookFilePath.toFile(), true));
 
-        CSVAdapter<Book> bookCsvAdapter =
-            new CSVAdapter(Book.class, bookReader, bookWriter);
+        IOAdapter<Book> bookCsvAdapter =
+                new CSVAdapter<>(Book.class, bookReader, bookWriter);
 
-        Book book1 = bookCsvAdapter.read(1);
-        assertEquals("Глуховский", book1.getAuthor());
-        assertEquals("Будущее", book1.getName());
-        assertEquals("978-5-17-118366-0", book1.getIsbn());
-        assertEquals("Научная фантастика", book1.getGenre());
+        Book book1 = new Book("��� ������", "��������","�����", "978-5-17-118366-0");
+        Book book2 = new Book("������ �������", "��������","�����", "876-5-91-118366-0");
 
-        Book expectedBook0 = new Book(
-            "Убик",
-            "Филип Дик",
-            "Научная фантастика",
-            "978-5-699-97309-5");
-        Book actualBook0 = bookCsvAdapter.read(0);
-        assertEquals(expectedBook0, actualBook0);
+        bookReader.mark((int) (bookFilePath.toFile().length()+book1.setCSVLine().length()+1));
+        index = bookCsvAdapter.append(book1);
+        bookReader.reset();
 
-        // TODO: написать тесты для проверки сущности автора
+        bookReader.mark((int) (bookFilePath.toFile().length()+book2.setCSVLine().length()+1));
+        index = bookCsvAdapter.append(book2);
+        bookReader.reset();
+
+
+        bookReader.mark((int)bookFilePath.toFile().length());
+        Book bookAtIndex1 = bookCsvAdapter.read(1);
+        bookReader.reset();
+        if (bookAtIndex1.equals(book1)) System.out.print("��������\n");
+
+        Book bookAtIndex2 = bookCsvAdapter.read(index);
+        bookReader.reset();
+        if (bookAtIndex2.equals(book2)) System.out.print("��������\n");
+
+        bookAtIndex2 = bookCsvAdapter.read(1);
+        bookReader.reset();
+        if (bookAtIndex2.equals(book1)) System.out.print("��������\n");
+
+        bookWriter.close();
+        bookReader.close();
+
+        //���� ������
+        Path authorFilePath = Paths.get("test-author-file.csv");
+
+        BufferedReader authorReader = new BufferedReader(
+                new FileReader(authorFilePath.toFile()));
+
+        BufferedWriter authorWriter = new BufferedWriter(
+                new FileWriter(authorFilePath.toFile(), true));
+
+        IOAdapter<Author> authorCsvAdapter =
+                new CSVAdapter<>(Author.class, authorReader, authorWriter);
+
+        Author Author1 = new Author("��������","���������");
+        Author Author2 = new Author ("����","��������");
+
+        authorReader.mark((int) (authorFilePath.toFile().length()+Author1.setCSVLine().length()+1));
+        index = authorCsvAdapter.append(Author1);
+        authorReader.reset();
+
+        authorReader.mark((int) (authorFilePath.toFile().length()+Author2.setCSVLine().length()+1));
+        index = authorCsvAdapter.append(Author2);
+        authorReader.reset();
+
+
+        authorReader.mark((int)authorFilePath.toFile().length());
+        Author AuthorAtIndex1 = authorCsvAdapter.read(1);
+        authorReader.reset();
+        if (AuthorAtIndex1.equals(Author1)) System.out.print("��������\n");
+
+        Author AuthorAtIndex2 = authorCsvAdapter.read(index);
+        authorReader.reset();
+        if (AuthorAtIndex2.equals(Author2)) System.out.print("��������\n");
+
+        AuthorAtIndex2 = authorCsvAdapter.read(1);
+        authorReader.reset();
+        if (AuthorAtIndex2.equals(Author1)) System.out.print("��������\n");
+
+        authorWriter.close();
+        authorReader.close();
     }
 
-    @Test
-    public void testAppend() throws IOException {
-
-        Path bookFilePath = Paths.get("test-book-file.csv");
-
-        BufferedReader bookReader = new BufferedReader(
-            new FileReader(bookFilePath.toFile()));
-
-        BufferedWriter bookWriter = new BufferedWriter(
-            new FileWriter(bookFilePath.toFile(), true));
-
-        CSVAdapter<Book> bookCsvAdapter =
-            new CSVAdapter(Book.class, bookReader, bookWriter);
-
-        Book newBook = new Book(
-            "Чертоги разума. Убей в себе идиота!",
-            "Андрей Курпатов",
-            "Психология",
-            "978-5-906902-91-7");
-
-        int bookIndex = bookCsvAdapter.append(newBook);
-        Book bookAtIndex = bookCsvAdapter.read(bookIndex);
-        assertEquals(newBook, bookAtIndex);
-
-        // TODO: написать тесты для проверки сущности автора
-    }
 }
