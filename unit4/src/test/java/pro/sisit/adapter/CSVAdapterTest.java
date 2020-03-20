@@ -14,117 +14,112 @@ import pro.sisit.model.Author;
 
 public class CSVAdapterTest {
 
+    private int bookIndex = 0;
+    private int authorIndex = 0;
+
     @Before
     public void createFile() {
 
         File bookFile = new File("test-book-file.csv");
         try {
-            if(!bookFile.exists()) bookFile.createNewFile();
-
+            if (!bookFile.exists()) {
+                bookFile.createNewFile();
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("File is not created",e);
         }
 
         File authorFile = new File("test-author-file.csv");
         try {
-            if(!authorFile.exists()) authorFile.createNewFile();
+            if (!authorFile.exists()) {
+                authorFile.createNewFile();
+            }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("File is not created",e);
         }
     }
 
     @After
     public void deleteFile() {
         File authorFile = new File("test-author-file.csv");
-        if(authorFile.exists()) authorFile.delete();
+        if (authorFile.exists()) {
+            if(!authorFile.delete()) {
+                throw new RuntimeException("File is not deleted");
+            }
+        }
 
         File bookFile = new File("test-book-file.csv");
-        if(bookFile.exists()) bookFile.delete();
-
+        if (bookFile.exists()) {
+            if(!bookFile.delete()) {
+                throw new RuntimeException("File is not deleted");
+            }
+        }
     }
 
     @Test
-    public void testMethods() throws IOException {
-        int index = 0;
+    public void testAppend() throws IOException {
         //book test
         Path bookFilePath = Paths.get("test-book-file.csv");
-
-        BufferedReader bookReader = new BufferedReader(
-                new FileReader(bookFilePath.toFile()));
-
-        BufferedWriter bookWriter = new BufferedWriter(
-                new FileWriter(bookFilePath.toFile(), true));
-
-        IOAdapter<Book> bookCsvAdapter =
-                new CSVAdapter<>(Book.class, bookReader, bookWriter);
-
-        Book book1 = new Book("JoyLand", "Stephen King","Horror", "978-5-17-118366-0");
-        Book book2 = new Book("Stephen King", "Lovecraft","Horror", "876-5-91-118366-0");
-
-        bookReader.mark((int) (bookFilePath.toFile().length()+book1.setCSVLine().length()+1));
-        index = bookCsvAdapter.append(book1);
-        bookReader.reset();
-
-        bookReader.mark((int) (bookFilePath.toFile().length()+book2.setCSVLine().length()+1));
-        index = bookCsvAdapter.append(book2);
-        bookReader.reset();
-
-
-        bookReader.mark((int)bookFilePath.toFile().length());
-        Book bookAtIndex1 = bookCsvAdapter.read(1);
-        bookReader.reset();
-        if (bookAtIndex1.equals(book1)) System.out.print("checked\n");
-
-        Book bookAtIndex2 = bookCsvAdapter.read(index);
-        bookReader.reset();
-        if (bookAtIndex2.equals(book2)) System.out.print("checked\n");
-
-        bookAtIndex2 = bookCsvAdapter.read(1);
-        bookReader.reset();
-        if (bookAtIndex2.equals(book1)) System.out.print("checked\n");
-
-        bookWriter.close();
-        bookReader.close();
-
-        //author test
         Path authorFilePath = Paths.get("test-author-file.csv");
 
-        BufferedReader authorReader = new BufferedReader(
-                new FileReader(authorFilePath.toFile()));
+        Book book1 = new Book("JoyLand", "Stephen King", "Horror", "978-5-17-118366-0");
+        Book book2 = new Book("Stephen King", "Lovecraft", "Horror", "876-5-91-118366-0");
 
-        BufferedWriter authorWriter = new BufferedWriter(
-                new FileWriter(authorFilePath.toFile(), true));
+        Author Author1 = new Author("Stephen King", "Portland");
+        Author Author2 = new Author("Lovecraft", "Providence");
 
-        IOAdapter<Author> authorCsvAdapter =
-                new CSVAdapter<>(Author.class, authorReader, authorWriter);
+        try (BufferedReader bookReader = new BufferedReader(new FileReader(bookFilePath.toFile()));
+             BufferedWriter bookWriter = new BufferedWriter(new FileWriter(bookFilePath.toFile(), true))) {
 
-        Author Author1 = new Author("Stephen King","Portland");
-        Author Author2 = new Author ("Lovecraft","Providence");
+            IOAdapter<Book> bookCsvAdapter =
+                    new CSVAdapter<>(Book.class, bookReader, bookWriter);
 
-        authorReader.mark((int) (authorFilePath.toFile().length()+Author1.setCSVLine().length()+1));
-        index = authorCsvAdapter.append(Author1);
-        authorReader.reset();
+            bookIndex = bookCsvAdapter.append(book1);
+            bookIndex = bookCsvAdapter.append(book2);
+        }
 
-        authorReader.mark((int) (authorFilePath.toFile().length()+Author2.setCSVLine().length()+1));
-        index = authorCsvAdapter.append(Author2);
-        authorReader.reset();
+        //author test
+        try (BufferedReader authorReader = new BufferedReader(new FileReader(authorFilePath.toFile()));
+                BufferedWriter authorWriter = new BufferedWriter(new FileWriter(authorFilePath.toFile(), true))) {
+
+            IOAdapter<Author> authorCsvAdapter =
+                    new CSVAdapter<>(Author.class, authorReader, authorWriter);
+
+            authorIndex = authorCsvAdapter.append(Author1);
+            authorIndex = authorCsvAdapter.append(Author2);
+        }
+    }
 
 
-        authorReader.mark((int)authorFilePath.toFile().length());
-        Author AuthorAtIndex1 = authorCsvAdapter.read(1);
-        authorReader.reset();
-        if (AuthorAtIndex1.equals(Author1)) System.out.print("checked\n");
+    @Test
+    public void testRead() throws IOException {
+        Path bookFilePath = Paths.get("test-book-file.csv");
+        Path authorFilePath = Paths.get("test-author-file.csv");
 
-        Author AuthorAtIndex2 = authorCsvAdapter.read(index);
-        authorReader.reset();
-        if (AuthorAtIndex2.equals(Author2)) System.out.print("checked\n");
+        Book book1 = new Book("JoyLand", "Stephen King", "Horror", "978-5-17-118366-0");
+        Author Author1 = new Author("Stephen King", "Portland");
 
-        AuthorAtIndex2 = authorCsvAdapter.read(1);
-        authorReader.reset();
-        if (AuthorAtIndex2.equals(Author1)) System.out.print("checked\n");
+        try (BufferedReader bookReader = new BufferedReader(new FileReader(bookFilePath.toFile()));
+             BufferedWriter bookWriter = new BufferedWriter(new FileWriter(bookFilePath.toFile(), true))) {
 
-        authorWriter.close();
-        authorReader.close();
+            IOAdapter<Book> bookCsvAdapter =
+                    new CSVAdapter<>(Book.class, bookReader, bookWriter);
+
+            bookIndex = bookCsvAdapter.append(book1);
+            Book bookAtIndex1 = bookCsvAdapter.read(bookIndex);
+            assertEquals(bookAtIndex1,book1);
+        }
+
+        try (BufferedReader authorReader = new BufferedReader(new FileReader(authorFilePath.toFile()));
+             BufferedWriter authorWriter = new BufferedWriter(new FileWriter(authorFilePath.toFile(), true))) {
+
+            IOAdapter<Author> authorCsvAdapter =
+                    new CSVAdapter<>(Author.class, authorReader, authorWriter);
+
+            authorIndex = authorCsvAdapter.append(Author1);
+            Author AuthorAtIndex1 = authorCsvAdapter.read(authorIndex);
+            assertEquals(Author1,AuthorAtIndex1);
+        }
     }
 }

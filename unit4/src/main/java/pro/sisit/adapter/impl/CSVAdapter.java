@@ -5,18 +5,16 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import pro.sisit.adapter.CSVImpl;
+import pro.sisit.adapter.CSVConverter;
 import pro.sisit.adapter.IOAdapter;
-import pro.sisit.model.Book;
 
-// 1. TODO: написать реализацию адаптера
 
-public class CSVAdapter<T extends CSVImpl> implements IOAdapter<T> {
+public class CSVAdapter<T extends CSVConverter> implements IOAdapter<T> {
 
     private Class<T> entityType;
     private BufferedReader reader;
     private BufferedWriter writer;
-
+    private final int BUFF_LIMIT = 5000;
 
     public CSVAdapter(Class<T> entityType, BufferedReader reader,
         BufferedWriter writer) {
@@ -27,27 +25,25 @@ public class CSVAdapter<T extends CSVImpl> implements IOAdapter<T> {
 
     @Override
     public T read(int rowIndex) {
-        int Index = 0;
         T entity = null;
         String text = null;
 
-
-
         try {
+            reader.mark(BUFF_LIMIT);
             for (int i = 0; i < rowIndex; i++) {
                 text = reader.readLine();
-                if(text == null) throw new RuntimeException("несуществующая строка");
+                if(text == null) throw new RuntimeException("null is read");
             }
-
+            reader.reset();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("read error",e);
         }
 
         try {
             entity = entityType.getDeclaredConstructor().newInstance();
-            entity.getCSVLine(text);
+            entity.setCSVLine(text);
         } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Set data error",e);
         }
 
         return entity;
@@ -56,15 +52,25 @@ public class CSVAdapter<T extends CSVImpl> implements IOAdapter<T> {
 
     @Override
     public int append(T entity) {
+        try {
+            writer.write(entity.getCSVLine() + "\n");
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("write error",e);
+        }
+        return getIndex();
+    }
+
+    public int getIndex () {
         int rowIndex = 0;
         try {
-            writer.write(entity.setCSVLine());
-            writer.flush();
-            while (reader.readLine() != null) {
+            reader.mark(BUFF_LIMIT);
+            while (reader.readLine()!=null) {
                 rowIndex++;
             }
+            reader.reset();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("getIndex Error",e);
         }
         return rowIndex;
     }

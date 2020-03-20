@@ -1,13 +1,16 @@
 package pro.sisit.model;
 
-import pro.sisit.adapter.CSVImpl;
+import pro.sisit.adapter.CSVConverter;
+
 
 import java.util.Objects;
 
-public class Author implements CSVImpl {
+public class Author implements CSVConverter {
 
     private String name;
     private String birthPlace;
+
+    private final String DELIMITER = ";";
 
     public Author() {
         this.name = null;
@@ -46,14 +49,14 @@ public class Author implements CSVImpl {
     }
 
     @Override
-    public void getCSVLine(String text) {
-        String[] newAuthor = text.split(", ");
+    public void setCSVLine(String text) {
+        String[] newAuthor = text.split(DELIMITER);
         this.name = newAuthor[0];
         this.birthPlace = newAuthor[1];
     }
 
     @Override
-    public String setCSVLine() {
-        return name + ", " + birthPlace + "\n";
+    public String  getCSVLine() {
+        return name + DELIMITER + birthPlace;
     }
 }
