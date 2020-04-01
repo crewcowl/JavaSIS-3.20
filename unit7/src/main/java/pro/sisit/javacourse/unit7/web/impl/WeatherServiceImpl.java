@@ -19,8 +19,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
 
-    @Value("${x-rapidapi-key}")
-    private String KEY;
+    private String KEY = System.getenv("RAPIDAPI_KEY");
 
 
     private final RestTemplate restTemplate;
