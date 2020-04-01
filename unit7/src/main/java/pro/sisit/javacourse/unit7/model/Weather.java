@@ -2,8 +2,6 @@ package pro.sisit.javacourse.unit7.model;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 
 @Data
 public class Weather {
@@ -11,4 +9,12 @@ public class Weather {
     private final String weather;
     private final Double temp;
     private final String city;
+
+    private static String DELIMITER = "\n";
+
+    public String weatherToString() {
+        return date + DELIMITER + city
+                + DELIMITER + "Weather: " + weather
+                + DELIMITER + "temp: " + temp + DELIMITER;
+    }
 }

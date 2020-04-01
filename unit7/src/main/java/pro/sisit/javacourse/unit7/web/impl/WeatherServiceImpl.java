@@ -1,6 +1,7 @@
 package pro.sisit.javacourse.unit7.web.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,21 +19,21 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class WeatherServiceImpl implements WeatherService {
 
-    private final String URL = "https://community-open-weather-map.p.rapidapi.com/weather?units=metric&mode=json&q=";
-    private final String HOST = "community-open-weather-map.p.rapidapi.com";
-    private final String KEY = "681178e147msh92a7f9ccacbf835p150307jsn27b16c020d0b";
-    //"cdd96ad95amsheebcca53e65aac1p136010jsn18e30e4e6350";
+    @Value("${x-rapidapi-key}")
+    private String KEY;
 
 
     private final RestTemplate restTemplate;
 
     @Override
     public Weather getWeather(String city) {
-        String url = this.URL + city;
+        String URL = "https://community-open-weather-map.p.rapidapi.com/weather?units=metric&mode=json&q=";
+        String url = URL + city;
 
         final HttpHeaders headers = new HttpHeaders();
-        headers.set("x-rapidapi-host", this.HOST);
-        headers.set("x-rapidapi-key", this.KEY);
+        String HOST = "community-open-weather-map.p.rapidapi.com";
+        headers.set("x-rapidapi-host", HOST);
+        headers.set("x-rapidapi-key", KEY);
         final HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 
         ResponseEntity<WeatherDTO> responseEntity

@@ -6,10 +6,8 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import pro.sisit.javacourse.unit7.data.WeatherDataService;
 import pro.sisit.javacourse.unit7.model.Weather;
-import pro.sisit.javacourse.unit7.parser.WeatherParser;
 import pro.sisit.javacourse.unit7.web.WeatherService;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @ShellComponent
@@ -19,15 +17,14 @@ public class WeatherShellCommands {
 
     private final WeatherService weatherService;
     private final WeatherDataService weatherDataService;
-    private final WeatherParser weatherParser;
 
     private Weather lastWeather;
 
     @ShellMethod(key ="weather", value = "print weather for city")
     public String getWeather (
             @ShellOption() String city){
-        this.lastWeather = weatherService.getWeather(city);
-        return weatherParser.weatherToString(lastWeather);
+        lastWeather = weatherService.getWeather(city);
+        return lastWeather.weatherToString();
     }
 
 
@@ -44,7 +41,7 @@ public class WeatherShellCommands {
     @ShellMethod("Load information")
     public String show () {
         return weatherDataService.load().stream()
-                .map(weatherParser::weatherToString)
+                .map(Weather::weatherToString)
                 .collect(Collectors.joining(System.lineSeparator()));
     }
 }
