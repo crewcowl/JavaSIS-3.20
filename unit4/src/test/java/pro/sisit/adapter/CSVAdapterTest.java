@@ -12,6 +12,7 @@ import org.junit.Test;
 import pro.sisit.adapter.impl.CSVAdapter;
 import pro.sisit.model.Book;
 import pro.sisit.model.Author;
+import pro.sisit.model.Entity;
 
 public class CSVAdapterTest {
 
@@ -66,8 +67,8 @@ public class CSVAdapterTest {
         Path bookFilePath = Paths.get("test-book-file.csv");
         Path authorFilePath = Paths.get("test-author-file.csv");
 
-        Book book1 = new Book("JoyLand", "Stephen King", "Horror", "978-5-17-118366-0");
-        Author Author1 = new Author("Stephen King", "Portland");
+        Entity book1 = new Book("JoyLand", "Stephen King", "Horror", "978-5-17-118366-0");
+        Entity Author1 = new Author("Stephen King", "Portland");
 
         try (BufferedReader bookReader = new BufferedReader(new FileReader(bookFilePath.toFile()));
              BufferedWriter bookWriter = new BufferedWriter(new FileWriter(bookFilePath.toFile(), true))) {
@@ -75,7 +76,7 @@ public class CSVAdapterTest {
             IOAdapter<Book> bookCsvAdapter =
                     new CSVAdapter<>(Book.class, bookReader, bookWriter);
 
-            Book bookAtIndex1 = bookCsvAdapter.read(1);
+            Entity bookAtIndex1 = bookCsvAdapter.read(1);
             assertEquals(bookAtIndex1, book1);
         }
 
@@ -85,7 +86,7 @@ public class CSVAdapterTest {
             IOAdapter<Author> authorCsvAdapter =
                     new CSVAdapter<>(Author.class, authorReader, authorWriter);
 
-            Author AuthorAtIndex1 = authorCsvAdapter.read(1);
+            Entity AuthorAtIndex1 = authorCsvAdapter.read(1);
             assertEquals(Author1, AuthorAtIndex1);
         }
     }
@@ -108,7 +109,7 @@ public class CSVAdapterTest {
                     new CSVAdapter<>(Book.class, bookReader, bookWriter);
 
             index = bookCsvAdapter.append(book2);
-            Book bookAtIndex1 = bookCsvAdapter.read(index);
+            Entity bookAtIndex1 = bookCsvAdapter.read(index);
             assertEquals(bookAtIndex1, book2);
         }
 
@@ -120,7 +121,7 @@ public class CSVAdapterTest {
                     new CSVAdapter<>(Author.class, authorReader, authorWriter);
 
             index = authorCsvAdapter.append(Author2);
-            Author AuthorAtIndex1 = authorCsvAdapter.read(index);
+            Entity AuthorAtIndex1 = authorCsvAdapter.read(index);
             assertEquals(Author2, AuthorAtIndex1);
         }
     }

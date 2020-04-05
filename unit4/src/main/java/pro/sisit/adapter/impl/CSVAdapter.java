@@ -3,10 +3,12 @@ package pro.sisit.adapter.impl;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import pro.sisit.adapter.CSVConverter;
 import pro.sisit.adapter.IOAdapter;
+import pro.sisit.factory.ClassFactory;
+import pro.sisit.model.Entity;
+import pro.sisit.service.ObjectParser;
 
 
 public class CSVAdapter<T extends CSVConverter> implements IOAdapter<T> {
@@ -14,7 +16,10 @@ public class CSVAdapter<T extends CSVConverter> implements IOAdapter<T> {
     private Class<T> entityType;
     private BufferedReader reader;
     private BufferedWriter writer;
+
     private final int BUFF_LIMIT = 5000;
+    private final ObjectParser objParser = new ObjectParser();
+    private final ClassFactory classFactory = new ClassFactory();
 
     public CSVAdapter(Class<T> entityType, BufferedReader reader,
         BufferedWriter writer) {
@@ -24,8 +29,8 @@ public class CSVAdapter<T extends CSVConverter> implements IOAdapter<T> {
     }
 
     @Override
-    public T read(int rowIndex) {
-        T entity = null;
+    public Entity read(int rowIndex) {
+        Entity entity;
         String text = null;
 
         try {
@@ -39,12 +44,8 @@ public class CSVAdapter<T extends CSVConverter> implements IOAdapter<T> {
             throw new RuntimeException("read error",e);
         }
 
-        try {
-            entity = entityType.getDeclaredConstructor().newInstance();
-            entity.setCSVLine(text);
-        } catch (InstantiationException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException("Set data error",e);
-        }
+            entity = classFactory.newT(entityType);
+            entity.setCSVLine(objParser.getObject(text));
 
         return entity;
     }
@@ -53,7 +54,7 @@ public class CSVAdapter<T extends CSVConverter> implements IOAdapter<T> {
     @Override
     public int append(T entity) {
         try {
-            writer.write(entity.getCSVLine() + "\n");
+            writer.write(objParser.getCSV(entity.getCSVLine()) + "\n");
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("write error",e);

@@ -1,12 +1,12 @@
 package pro.sisit.model;
 
 import pro.sisit.adapter.CSVConverter;
-import pro.sisit.service.ObjectParser;
 
 
+import java.util.ArrayList;
 import java.util.Objects;
 
-public class Author extends ObjectParser implements CSVConverter {
+public class Author extends Entity implements CSVConverter {
 
     private String name;
     private String birthPlace;
@@ -56,12 +56,16 @@ public class Author extends ObjectParser implements CSVConverter {
     }
 
     @Override
-    public void setCSVLine(String text) {
-        CSVStringToAuthor(text,this);
+    public void setCSVLine(ArrayList<String> text) {
+        this.name = text.get(0);
+        this.birthPlace = text.get(1);
     }
 
     @Override
-    public String  getCSVLine() {
-        return authorToCSVString(this);
+    public ArrayList<String>  getCSVLine() {
+        ArrayList<String> text = new ArrayList<>();
+        text.add(this.name);
+        text.add(this.birthPlace);
+        return text;
     }
 }
