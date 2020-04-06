@@ -1,17 +1,18 @@
 package pro.sisit.factory;
 
+import pro.sisit.adapter.Serializable;
 import pro.sisit.model.Author;
 import pro.sisit.model.Book;
-import pro.sisit.model.Entity;
+import pro.sisit.model.ClassType;
 
-public class ClassFactory<T> {
+public class ClassFactory {
 
-    public Entity newT(T obj) {
-        if(obj.toString().contains("Book")){
+    public Serializable newT(ClassType type) {
+        if(type == ClassType.Book){
             return new Book();
-        } if (obj.toString().contains("Author")) {
+        } if (type == ClassType.Author) {
             return new Author();
         } else
-            return null;
+            throw new RuntimeException("not supported type");
     }
 }

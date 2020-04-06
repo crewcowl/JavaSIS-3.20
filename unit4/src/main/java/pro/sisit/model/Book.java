@@ -1,11 +1,11 @@
 package pro.sisit.model;
 
-import pro.sisit.adapter.CSVConverter;
+import pro.sisit.adapter.Serializable;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Book extends Entity implements CSVConverter {
+public class Book implements Serializable {
 
     private String name;
     private String author;
@@ -78,7 +78,10 @@ public class Book extends Entity implements CSVConverter {
 
 
     @Override
-    public void setCSVLine(ArrayList<String> text) {
+    public void setLine(ArrayList<String> text) {
+        if(text.isEmpty()) {
+            throw new RuntimeException("Book class set data is null");
+        }
         this.name = text.get(0);
         this.author = text.get(1);
         this.genre = text.get(2);
@@ -86,7 +89,7 @@ public class Book extends Entity implements CSVConverter {
     }
 
     @Override
-    public ArrayList<String> getCSVLine() {
+    public ArrayList<String> getLine() {
         ArrayList<String> text = new ArrayList<>();
         text.add(this.name);
         text.add(this.author);
