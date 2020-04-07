@@ -79,7 +79,7 @@ public class Book implements Serializable {
 
     @Override
     public void setLine(ArrayList<String> text) {
-        if(text.isEmpty()) {
+        if(text.size() != 4 || text == null) {
             throw new RuntimeException("Book class set data is null");
         }
         this.name = text.get(0);

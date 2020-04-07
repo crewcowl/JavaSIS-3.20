@@ -57,7 +57,7 @@ public class Author implements Serializable {
 
     @Override
     public void setLine(ArrayList<String> text) {
-        if(text.isEmpty()) {
+        if(text.size() != 2 || text == null) {
             throw new RuntimeException("Author class set data is null");
         }
         this.name = text.get(0);
