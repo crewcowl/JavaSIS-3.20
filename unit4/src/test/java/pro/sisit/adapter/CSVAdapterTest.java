@@ -1,12 +1,9 @@
 package pro.sisit.adapter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.After;
@@ -14,79 +11,118 @@ import org.junit.Before;
 import org.junit.Test;
 import pro.sisit.adapter.impl.CSVAdapter;
 import pro.sisit.model.Book;
-
-// TODO: 2. Описать тестовые кейсы
+import pro.sisit.model.Author;
+import pro.sisit.model.ClassType;
 
 public class CSVAdapterTest {
 
     @Before
-    public void createFile() {
-        // TODO: создать и заполнить csv-файл для сущности Author
-        // TODO: создать и заполнить csv-файл для сущности Book
+    public void createFile() throws IOException {
 
-        // * По желанию можете придумать и свои сущности
+        Path bookFilePath = Paths.get("test-book-file.csv");
+        Path authorFilePath = Paths.get("test-author-file.csv");
+
+        File bookFile = new File("test-book-file.csv");
+        try {
+            if (!bookFile.exists()) {
+                bookFile.createNewFile();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("File is not created", e);
+        }
+
+        File authorFile = new File("test-author-file.csv");
+        try {
+            if (!authorFile.exists()) {
+                authorFile.createNewFile();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("File is not created", e);
+        }
+
+        try (BufferedWriter bookWriter = new BufferedWriter(new FileWriter(bookFilePath.toFile(), true));
+             BufferedWriter authorWriter = new BufferedWriter(new FileWriter(authorFilePath.toFile(), true))) {
+            bookWriter.write("JoyLand;Stephen King;Horror;978-5-17-118366-0\n");
+            authorWriter.write("Stephen King;Portland\n");
+        } catch (IOException e) {
+            throw new RuntimeException("first writing error", e);
+        }
     }
 
     @After
     public void deleteFile() {
-        // TODO: удалить файлы после тестирования
+        File authorFile = new File("test-author-file.csv");
+        if (authorFile.exists()) {
+            assertTrue(authorFile.delete());
+        }
+
+        File bookFile = new File("test-book-file.csv");
+        if (bookFile.exists()) {
+            assertTrue(bookFile.delete());
+        }
     }
 
     @Test
     public void testRead() throws IOException {
-
         Path bookFilePath = Paths.get("test-book-file.csv");
+        Path authorFilePath = Paths.get("test-author-file.csv");
 
-        BufferedReader bookReader = new BufferedReader(
-            new FileReader(bookFilePath.toFile()));
+        Serializable book1 = new Book("JoyLand", "Stephen King", "Horror", "978-5-17-118366-0");
+        Serializable Author1 = new Author("Stephen King", "Portland");
 
-        BufferedWriter bookWriter = new BufferedWriter(
-            new FileWriter(bookFilePath.toFile(), true));
+        try (BufferedReader bookReader = new BufferedReader(new FileReader(bookFilePath.toFile()));
+             BufferedWriter bookWriter = new BufferedWriter(new FileWriter(bookFilePath.toFile(), true))) {
 
-        CSVAdapter<Book> bookCsvAdapter =
-            new CSVAdapter(Book.class, bookReader, bookWriter);
+            IOAdapter<Book> bookCsvAdapter =
+                    new CSVAdapter<>(bookReader, bookWriter, ClassType.Book);
 
-        Book book1 = bookCsvAdapter.read(1);
-        assertEquals("Глуховский", book1.getAuthor());
-        assertEquals("Будущее", book1.getName());
-        assertEquals("978-5-17-118366-0", book1.getIsbn());
-        assertEquals("Научная фантастика", book1.getGenre());
+            Serializable bookAtIndex1 = bookCsvAdapter.read(1);
+            assertEquals(bookAtIndex1, book1);
+        }
 
-        Book expectedBook0 = new Book(
-            "Убик",
-            "Филип Дик",
-            "Научная фантастика",
-            "978-5-699-97309-5");
-        Book actualBook0 = bookCsvAdapter.read(0);
-        assertEquals(expectedBook0, actualBook0);
+        try (BufferedReader authorReader = new BufferedReader(new FileReader(authorFilePath.toFile()));
+             BufferedWriter authorWriter = new BufferedWriter(new FileWriter(authorFilePath.toFile(), true))) {
 
-        // TODO: написать тесты для проверки сущности автора
+            IOAdapter<Author> authorCsvAdapter =
+                    new CSVAdapter<>(authorReader, authorWriter, ClassType.Author);
+
+            Serializable AuthorAtIndex1 = authorCsvAdapter.read(1);
+            assertEquals(Author1, AuthorAtIndex1);
+        }
     }
 
     @Test
     public void testAppend() throws IOException {
-
+        //book test
         Path bookFilePath = Paths.get("test-book-file.csv");
+        Path authorFilePath = Paths.get("test-author-file.csv");
 
-        BufferedReader bookReader = new BufferedReader(
-            new FileReader(bookFilePath.toFile()));
+        int index = 0;
 
-        BufferedWriter bookWriter = new BufferedWriter(
-            new FileWriter(bookFilePath.toFile(), true));
+        Book book2 = new Book("Call of Cthulhu", "Lovecraft", "Horror", "876-5-91-118366-0");
+        Author Author2 = new Author("Lovecraft", "Providence");
 
-        CSVAdapter<Book> bookCsvAdapter =
-            new CSVAdapter(Book.class, bookReader, bookWriter);
+        try (BufferedReader bookReader = new BufferedReader(new FileReader(bookFilePath.toFile()));
+             BufferedWriter bookWriter = new BufferedWriter(new FileWriter(bookFilePath.toFile(), true))) {
 
-        Book newBook = new Book(
-            "Чертоги разума. Убей в себе идиота!",
-            "Андрей Курпатов",
-            "Психология",
-            "978-5-906902-91-7");
+            IOAdapter<Book> bookCsvAdapter =
+                    new CSVAdapter<>(bookReader, bookWriter,ClassType.Book);
 
-        int bookIndex = bookCsvAdapter.append(newBook);
-        Book bookAtIndex = bookCsvAdapter.read(bookIndex);
-        assertEquals(newBook, bookAtIndex);
+            index = bookCsvAdapter.append(book2);
+            Serializable bookAtIndex1 = bookCsvAdapter.read(index);
+            assertEquals(bookAtIndex1, book2);
+        }
 
-        // TODO: написать тесты для проверки сущности автора
+        //author test
+        try (BufferedReader authorReader = new BufferedReader(new FileReader(authorFilePath.toFile()));
+             BufferedWriter authorWriter = new BufferedWriter(new FileWriter(authorFilePath.toFile(), true))) {
+
+            IOAdapter<Author> authorCsvAdapter =
+                    new CSVAdapter<>(authorReader, authorWriter,ClassType.Author);
+
+            index = authorCsvAdapter.append(Author2);
+            Serializable AuthorAtIndex1 = authorCsvAdapter.read(index);
+            assertEquals(Author2, AuthorAtIndex1);
+        }
     }
 }
