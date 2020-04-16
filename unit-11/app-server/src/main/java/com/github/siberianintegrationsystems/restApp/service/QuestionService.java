@@ -4,4 +4,6 @@ import com.github.siberianintegrationsystems.restApp.controller.dto.QuestionsIte
 
 public interface QuestionService {
     QuestionsItemDTO createQuestion(QuestionsItemDTO dto);
+
+    QuestionsItemDTO editQuestion(QuestionsItemDTO dto);
 }

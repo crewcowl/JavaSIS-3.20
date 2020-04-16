@@ -5,10 +5,14 @@ import com.github.siberianintegrationsystems.restApp.controller.dto.QuestionsIte
 import com.github.siberianintegrationsystems.restApp.data.AnswerRepository;
 import com.github.siberianintegrationsystems.restApp.data.QuestionRepository;
 import com.github.siberianintegrationsystems.restApp.entity.Answer;
+import com.github.siberianintegrationsystems.restApp.entity.BaseEntity;
 import com.github.siberianintegrationsystems.restApp.entity.Question;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,6 +34,29 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.save(question);
 
         for (AnswerItemDTO answerDTO : dto.answers) {
+            Answer answer = new Answer();
+            answer.setName(answerDTO.answerText);
+            answer.setCorrect(answerDTO.isCorrect);
+            answer.setQuestion(question);
+
+            answerRepository.save(answer);
+        }
+
+        return new QuestionsItemDTO(question,
+                answerRepository.findByQuestion(question));
+    }
+    //Нужны тесты
+    @Override
+    public QuestionsItemDTO editQuestion(QuestionsItemDTO dto) {
+        Question question = questionRepository.findById(Long.parseLong(dto.id)).get();
+        question.setName(dto.name);
+        questionRepository.save(question);
+
+        answerRepository.findByQuestion(question).forEach(answerRepository::delete);
+
+
+        for (AnswerItemDTO answerDTO : dto.answers) {
+
             Answer answer = new Answer();
             answer.setName(answerDTO.answerText);
             answer.setCorrect(answerDTO.isCorrect);
