@@ -29,43 +29,47 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionsItemDTO createQuestion(QuestionsItemDTO dto) {
-        Question question = new Question();
-        question.setName(dto.name);
-        questionRepository.save(question);
+        Question question = getQuestion(dto);
 
-        for (AnswerItemDTO answerDTO : dto.answers) {
-            Answer answer = new Answer();
-            answer.setName(answerDTO.answerText);
-            answer.setCorrect(answerDTO.isCorrect);
-            answer.setQuestion(question);
-
-            answerRepository.save(answer);
-        }
+        dto.answers.forEach(a -> setAnswer(a,question));
 
         return new QuestionsItemDTO(question,
                 answerRepository.findByQuestion(question));
     }
-    //Нужны тесты
+
     @Override
     public QuestionsItemDTO editQuestion(QuestionsItemDTO dto) {
-        Question question = questionRepository.findById(Long.parseLong(dto.id)).get();
-        question.setName(dto.name);
-        questionRepository.save(question);
+        Question question = getQuestion(dto);
 
         answerRepository.findByQuestion(question).forEach(answerRepository::delete);
 
-
-        for (AnswerItemDTO answerDTO : dto.answers) {
-
-            Answer answer = new Answer();
-            answer.setName(answerDTO.answerText);
-            answer.setCorrect(answerDTO.isCorrect);
-            answer.setQuestion(question);
-
-            answerRepository.save(answer);
-        }
+        dto.answers.forEach(a -> setAnswer(a,question));
 
         return new QuestionsItemDTO(question,
                 answerRepository.findByQuestion(question));
+    }
+
+    @Override
+    public Question getQuestion (QuestionsItemDTO dto) {
+
+        Question question = (dto.id != null) ?
+                questionRepository
+                        .findById(Long.parseLong(dto.id))
+                        .orElseThrow(() -> new RuntimeException("нет вопроса с таким Id"))
+                : new Question();
+
+        question.setName(dto.name);
+        questionRepository.save(question);
+        return question;
+    }
+
+    @Override
+    public void setAnswer (AnswerItemDTO dto, Question question) {
+        Answer answer = new Answer();
+        answer.setName(dto.answerText);
+        answer.setCorrect(dto.isCorrect);
+        answer.setQuestion(question);
+
+        answerRepository.save(answer);
     }
 }

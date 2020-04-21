@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,10 +52,11 @@ public class JournalServiceImpl implements JournalService {
         List<? extends JournalItemDTO> collection;
         switch (id) {
             case QUESTIONS_JOURNAL_ID:
+
                 collection = getCollection(
                         req.search,
                         questionRepository::findByNameContainingIgnoreCase,
-                        q -> new QuestionsItemDTO(
+                        q ->  new QuestionsItemDTO(
                                 q,
                                 answerRepository.findByQuestion(q)));
                 break;
@@ -81,4 +83,5 @@ public class JournalServiceImpl implements JournalService {
                 .map(mapper)
                 .collect(Collectors.toList());
     }
+
 }

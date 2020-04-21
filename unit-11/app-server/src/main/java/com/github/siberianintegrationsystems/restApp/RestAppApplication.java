@@ -8,6 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @SpringBootApplication
 public class RestAppApplication {
@@ -19,17 +20,18 @@ public class RestAppApplication {
 		SpringApplication.run(RestAppApplication.class, args);
 	}
 
-	@PostConstruct
-	private void initData() {
-		Journal journal = new Journal();
-		journal.setId(JournalServiceImpl.QUESTIONS_JOURNAL_ID);
-		journal.setName("Вопросы");
-		journal.setDefaultPageSize(15L);
-		journalRepository.save(journal);
-
-		journal.setId(JournalServiceImpl.SESSIONS_JOURNAL_ID);
-		journal.setName("Сессии");
-		journal.setDefaultPageSize(15L);
-		journalRepository.save(journal);
-	}
+//	@PostConstruct
+//	private void initData() {
+//
+//		Journal journal = new Journal();
+//		journal.setId(JournalServiceImpl.QUESTIONS_JOURNAL_ID);
+//		journal.setName("Вопросы");
+//		journal.setDefaultPageSize(15L);
+//		journalRepository.save(journal);
+//
+//		journal.setId(JournalServiceImpl.SESSIONS_JOURNAL_ID);
+//		journal.setName("Сессии");
+//		journal.setDefaultPageSize(15L);
+//		journalRepository.save(journal);
+//	}
 }
