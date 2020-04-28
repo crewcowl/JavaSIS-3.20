@@ -196,23 +196,10 @@ public class SessionServiceImplTest {
 
     @Test
     public void resultForManyCorrectAnswerTest() {
-        List<SessionQuestionAnswer> sessionQuestionAnswers = new ArrayList<>();
-        SessionQuestionAnswer sessionQuestionAnswer = new SessionQuestionAnswer();
-        sessionQuestionAnswer.id = String.valueOf(answerRepository.findByName("Картошка").getId());
-        SessionQuestionAnswer sessionQuestionAnswer2 = new SessionQuestionAnswer();
-        sessionQuestionAnswer2.id = String.valueOf(answerRepository.findByName("Грибы").getId());
-        SessionQuestionAnswer sessionQuestionAnswer1 = new SessionQuestionAnswer();
-        sessionQuestionAnswer1.id = String.valueOf(answerRepository.findByName("Сапог").getId());
-
-
-        sessionQuestionAnswers.add(sessionQuestionAnswer2);
-
-        List<Answer> answers = answerRepository.findByQuestion(questionRepository.findByNameContainingIgnoreCase("Съедобно?").get(0));
-        double result = sessionService.resultForManyCorrectAnswer(sessionQuestionAnswers,answers,2);
+        double result = sessionService.resultForManyCorrectAnswer(3,1, 0,2);
         assertEquals(0.5,result,0);
 
-        sessionQuestionAnswers.add(sessionQuestionAnswer);
-        result = sessionService.resultForManyCorrectAnswer(sessionQuestionAnswers,answers,2);
+        result = sessionService.resultForManyCorrectAnswer(3,2,0,2);
         assertEquals(1,result,0);
     }
 

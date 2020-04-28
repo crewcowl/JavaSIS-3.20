@@ -24,7 +24,7 @@ public interface SessionService {
 
     double resultForOneCorrectAnswer (List<SessionQuestionAnswer> checkedAnswers);
 
-    double resultForManyCorrectAnswer (List<SessionQuestionAnswer> checkedAnswers,List<Answer> answers, int correctAnswers);
+    double resultForManyCorrectAnswer (double allAnswers, double correctCheckedAnswers, double unCorrectCheckedAnswers, int correctAnswers);
 
     double getResultForSession (AnsweredQuestionDTO question, List<Answer> sessionAnswers);
 }

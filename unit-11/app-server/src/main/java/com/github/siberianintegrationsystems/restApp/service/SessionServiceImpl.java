@@ -56,6 +56,10 @@ public class SessionServiceImpl implements SessionService {
         double result = 0.0;
         List<Answer> sessionAnswers = new LinkedList<>();
 
+        if(dto.questionsList == null || dto.questionsList.size() == 0) {
+            throw new RuntimeException("Не получен список вопросов");
+        }
+
         for(AnsweredQuestionDTO question : dto.questionsList) {
             result = result + getResultForSession(question, sessionAnswers);
         }
@@ -115,10 +119,8 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public double resultForManyCorrectAnswer (List<SessionQuestionAnswer> checkedAnswers, List<Answer> answers, int correctAnswers) {
-        double allAnswers = answers.size();
-        double correctCheckedAnswers = countOfAnswersCorrect(checkedAnswers,true);
-        double unCorrectCheckedAnswers = countOfAnswersCorrect(checkedAnswers,false);
+    public double resultForManyCorrectAnswer (double allAnswers, double correctCheckedAnswers, double unCorrectCheckedAnswers, int correctAnswers) {
+
         /*Суть проверки скорее в том что бы Количество всех ответов не совпадало с количеством правильных,
         но если нет неправильных то мы в любом случае избегаем деления на 0, а если нет неправильных выбраных то эта функция все равно будет 0,
         поэтому проверку оставил такой
@@ -144,7 +146,13 @@ public class SessionServiceImpl implements SessionService {
 
         checkedAnswers.forEach(a -> sessionAnswers.add(findAnswerById(a)));
 
-        return  ((correctAnswers == 1)  ?
-                        resultForOneCorrectAnswer(checkedAnswers) : resultForManyCorrectAnswer(checkedAnswers,answers,correctAnswers));
+        if(correctAnswers == 1 ) {
+            return resultForOneCorrectAnswer(checkedAnswers);
+        } else {
+            double allAnswers = answers.size();
+            double correctCheckedAnswers = countOfAnswersCorrect(checkedAnswers,true);
+            double unCorrectCheckedAnswers = countOfAnswersCorrect(checkedAnswers,false);
+            return resultForManyCorrectAnswer(allAnswers,correctCheckedAnswers,unCorrectCheckedAnswers,correctAnswers);
+        }
     }
 }

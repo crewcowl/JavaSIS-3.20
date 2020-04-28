@@ -41,7 +41,7 @@ public class QuestionServiceImpl implements QuestionService {
     public QuestionsItemDTO editQuestion(QuestionsItemDTO dto) {
         Question question = getQuestion(dto);
 
-        answerRepository.findByQuestion(question).forEach(answerRepository::delete);
+        answerRepository.deleteAll(answerRepository.findByQuestion(question));
 
         dto.answers.forEach(a -> setAnswer(a,question));
 
